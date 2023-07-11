@@ -1,9 +1,10 @@
 const express = require("express");
 const qrcode = require("qrcode-terminal");
 const puppeteer = require("puppeteer");
+const app = express();
 
 require("dotenv").config();
-const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -31,9 +32,25 @@ client.on("ready", () => {
 client.initialize();
 
 app.get("/send", (req, res) => {
+  const groupId = process.env.GROUP_ID;
   const { message } = req.body;
 
-  console.log(req.body);
+  console.log("MESSAGE:", message);
+
+  try {
+    const result = client.sendMessage(groupId, message);
+    res.status(200).send(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
+});
+
+app.get("/ping", (req, res) => {
+  const groupId = process.env.GROUP_ID;
+  const { message } = req.body;
+
+  console.log("MESSAGE:", message);
 
   try {
     const result = client.sendMessage(groupId, message);
